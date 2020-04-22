@@ -1,0 +1,150 @@
+def AI():
+    global game_still_going
+    global winner
+    score = 0
+    move = 0
+    max_score = -10000
+    for i in range(9):
+        if board[i] == '-':
+            board[i] = 'O'
+            score = minimax(board,False)
+            
+            board[i] = '-'
+            if max_score<score:
+                max_score = score
+                move = i
+                board[move] = 'O'
+                board[move] = '-'
+    winner = 'None'
+    board[move] = 'O'
+    game_still_going = True
+    flip_player()
+    display_board()
+    
+    
+def display_board():
+    print('\n',board[0],'|',board[1],'|',board[2],'\n',board[3],'|',board[4],'|',board[5],'\n',board[6],'|',board[7],'|',board[8])
+
+def valid(pos):
+    if board[pos] == '-': 
+        return True 
+    else:
+        return False
+    if pos in [1,2,3,4,5,6,7,8,9]:
+        return True
+    return False
+
+def handle_turn():
+    global current_player
+    print(current_player,end = '')
+    print('s Turn')
+    pos = 0
+    try:
+        pos = int(input('Enter Posiotion from 1 to 9 '))
+    except ValueError:
+        print('Invalid Value')
+        handle_turn()
+    if not valid(pos-1):
+        print('Invalid position')
+        handle_turn()
+    else:
+        pos = pos - 1
+        board[pos] = current_player
+
+def flip_player():
+    global current_player
+    if current_player == 'X':
+        current_player = 'O'
+    else:
+        current_player = 'X'
+    
+def check_row(current_board):
+    global winner
+    global game_still_going
+    row1 = current_board[0] == current_board[1] == current_board[2] != '-'
+    row2 = current_board[3] == current_board[4] == current_board[5] != '-'
+    row3 = current_board[6] == current_board[7] == current_board[8] != '-'
+    if row1 or row2 or row3:
+        game_still_going = False
+    if row1:
+        winner = current_board[0]
+        return
+    if row2:
+        winner = current_board[3]
+        return
+    if row3:
+        winner = current_board[6]
+        return
+    return
+
+def check_col(current_board):
+    global winner
+    global game_still_going
+    col1 = current_board[0] == current_board[3] == current_board[6] != '-'
+    col2 = current_board[1] == current_board[4] == current_board[7] != '-'
+    col3 = current_board[2] == current_board[5] == current_board[8] != '-'
+    if col1 or col2 or col3:
+        game_still_going = False
+    if col1:
+        winner = current_board[0]
+        return
+    if col2:
+        winner = current_board[1]
+        return
+    if col3:
+        winner = current_board[2]
+        return
+    return
+
+def check_diagonal(current_board):
+    global winner
+    global game_still_going
+    d1 = current_board[0] == current_board[4] == current_board[8] != '-'
+    d2 = current_board[2] == current_board[4] == current_board[6] != '-'
+    if d1 or d2:
+        game_still_going = False
+    if d1:
+        winner = current_board[0]
+        return
+    if d2:
+        winner = current_board[2]
+        return
+    return
+
+def check_tie(current_board):
+    global winner
+    global game_still_going
+    if '-' not in board:
+        winner = 'Tie'
+        game_still_going = False
+
+def who_won(current_board):
+    global winner
+    check_row(current_board)
+    check_col(current_board)
+    check_diagonal(current_board)
+    if winner != 'O' and winner != 'X': 
+        check_tie(current_board)
+    
+def play_game():
+    global game_still_going
+    global current_player
+    global winner
+    display_board()
+        
+    while game_still_going:
+        handle_turn()
+        display_board()
+        
+        flip_player()
+        who_won(board)
+        if game_still_going == True:
+            if current_player == 'O':
+                AI()
+        who_won(board)
+        
+    if winner == 'X' or winner == 'O':
+        print('Winner is ',winner)
+    else:
+        print('Tie')
+play_game()
